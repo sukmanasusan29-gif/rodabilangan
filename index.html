@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#33258f">
+<link rel="manifest" href="manifest.json">
+<title>Benteng Bilangan – Petualangan Pengurangan</title>
+<style>
+:root{--p:#4c35b5;--p2:#24166f;--gold:#ffc857;--green:#39b86f;--red:#e95d5d;--ink:#25243a;--card:#fff;--bg:#eef0ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:linear-gradient(145deg,#20145f,#6756d9);color:var(--ink);min-height:100vh}
+button{font:inherit;border:0;cursor:pointer}
+.app{width:100%;max-width:520px;min-height:100vh;margin:auto;background:var(--bg);overflow:hidden;position:relative;box-shadow:0 0 35px #0005}
+.screen{display:none;min-height:100vh;padding:18px}.screen.active{display:block}
+.hero{min-height:100vh;background:radial-gradient(circle at 50% 15%,#9a91ff,#4d3db6 48%,#21145e);color:white;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.logo{width:130px;height:130px;border-radius:34px;background:linear-gradient(145deg,#fff,#dfe4ff);display:grid;place-items:center;font-size:70px;box-shadow:0 18px 35px #0005;margin-bottom:18px}
+h1{font-size:30px;margin:0 0 4px}.subtitle{opacity:.9;margin-bottom:22px}
+.btn{width:100%;max-width:360px;padding:14px 18px;border-radius:18px;margin:7px 0;font-weight:800;box-shadow:0 6px 14px #0002}
+.primary{background:linear-gradient(135deg,#19c77a,#079e61);color:white}.gold{background:linear-gradient(135deg,#ffd76a,#f2a900);color:#4b3500}.light{background:#fff;color:var(--p)}
+.credit{font-size:11px;opacity:.8;margin-top:16px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.back{background:#fff;border-radius:12px;padding:8px 12px;font-weight:700}
+.pill{background:#fff;padding:8px 11px;border-radius:16px;font-weight:800;font-size:12px;box-shadow:0 3px 10px #0001}
+.card{background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px #2a22631a;margin-bottom:12px}
+.map{position:relative;background:linear-gradient(#9ed7ff,#ccecff 45%,#92c98b);border-radius:24px;min-height:640px;padding:18px;overflow:hidden}
+.map:before{content:"☁️     ☁️          ☁️";position:absolute;top:18px;left:8px;right:0;font-size:28px;opacity:.7}
+.node{position:absolute;width:82%;left:9%;padding:12px;background:#ffffffee;border:3px solid #fff;border-radius:18px;display:flex;align-items:center;gap:10px;box-shadow:0 7px 14px #0002}
+.node:nth-child(1){top:65px}.node:nth-child(2){top:160px}.node:nth-child(3){top:255px}.node:nth-child(4){top:350px}.node:nth-child(5){top:445px}.node:nth-child(6){top:540px}
+.node .ico{font-size:32px}.node h3{font-size:13px;margin:0}.node p{font-size:10px;margin:2px 0;color:#666}.node button{margin-left:auto;background:var(--p);color:#fff;padding:8px 10px;border-radius:12px;font-weight:800;font-size:11px}.node.lock{filter:grayscale(1);opacity:.58}.node.done{border-color:var(--gold)}
+.wheel-wrap{text-align:center}.wheel{width:min(82vw,350px);height:min(82vw,350px);max-width:350px;max-height:350px;margin:18px auto;position:relative;display:grid;place-items:center}
+.wheel svg{width:100%;height:100%;transition:transform 4s cubic-bezier(.12,.8,.15,1);filter:drop-shadow(0 12px 12px #0003)}
+.wheel-center{position:absolute;width:92px;height:92px;border-radius:50%;background:#fff;border:8px solid #ffd75b;display:grid;place-items:center;font-size:13px;font-weight:900;color:var(--p);box-shadow:0 5px 12px #0003;z-index:2}
+.pointer{font-size:32px;position:absolute;top:-7px;z-index:3}
+.wheel-label{font-weight:900;color:var(--p2);font-size:18px}
+.challenge{display:none}.challenge.active{display:block}
+.qnum{font-size:12px;color:#777;font-weight:800}.question{font-size:30px;font-weight:950;text-align:center;margin:18px 0;color:var(--p2)}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}.opt{background:#f0f1fa;border:2px solid #ddd;border-radius:15px;padding:15px;font-size:19px;font-weight:900}.opt.correct{background:#39b86f;color:white;border-color:#39b86f}.opt.wrong{background:#e95d5d;color:white}
+.feedback{text-align:center;min-height:28px;font-weight:800;margin-top:10px}.inputrow{display:flex;gap:8px}.inputrow input{flex:1;border:2px solid #ddd;border-radius:14px;text-align:center;font-size:22px;padding:12px}
+.reward{text-align:center;padding:28px 10px}.reward .big{font-size:70px}.stars{font-size:30px;margin:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#f1f2ff;border-radius:14px;padding:10px;text-align:center}.stat b{display:block;font-size:19px}
+.badges{display:grid;grid-template-columns:1fr 1fr;gap:10px}.badge{background:#fff;border-radius:18px;padding:15px;text-align:center;box-shadow:0 5px 12px #0001}.badge.locked{filter:grayscale(1);opacity:.5}.badge div{font-size:35px}
+.install{display:none}
+.small{font-size:12px;color:#666;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(80px);background:#20145f;color:white;padding:12px 18px;border-radius:15px;transition:.3s;z-index:20;box-shadow:0 8px 20px #0004}.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+<section id="home" class="screen active hero">
+<div class="logo">🏰</div><h1>Benteng Bilangan</h1><div class="subtitle">Solo Math Adventure • Pengurangan</div>
+<button class="btn primary" onclick="show('map');renderMap()">🗺️ MULAI PETUALANGAN</button>
+<button class="btn gold" onclick="show('badges');renderBadges()">🏆 KOLEKSI REWARD</button>
+<button id="install" class="btn light install" onclick="installPWA()">📲 INSTAL DI HP</button>
+<div class="credit">Khusus Kelas 2 MIS Annajiyah<br>Pembuat games: Susan Sukmana</div>
+</section>
+
+<section id="map" class="screen">
+<div class="top"><button class="back" onclick="show('home')">🏠 Menu</button><div class="pill" id="currency">⭐ 0 &nbsp; 💎 0</div></div>
+<div class="card"><b>🌟 Peta Petualangan</b><div class="small">Selesaikan wilayah secara bertahap. Setiap wilayah membuka tantangan baru.</div></div>
+<div class="map" id="mapNodes"></div>
+</section>
+
+<section id="wheelScreen" class="screen">
+<div class="top"><button class="back" onclick="show('map');renderMap()">← Peta</button><div class="pill" id="levelPill"></div></div>
+<div class="card wheel-wrap">
+<div class="wheel-label" id="levelTitle"></div>
+<div class="wheel"><div class="pointer">▼</div><svg id="wheelSvg" viewBox="0 0 360 360"></svg><div class="wheel-center">PUTAR</div></div>
+<button class="btn primary" id="spinBtn" onclick="spinWheel()">🎡 PUTAR PETUALANGAN</button>
+<div class="small">Roda menentukan jenis tantangan. Tidak ada timer.</div>
+</div>
+</section>
+
+<section id="game" class="screen">
+<div class="top"><button class="back" onclick="confirmExit()">← Kembali</button><div class="pill" id="gameProgress"></div></div>
+<div class="card"><div class="small" id="challengeType"></div><div class="question" id="question">...</div><div id="answerArea"></div><div class="feedback" id="feedback"></div></div>
+</section>
+
+<section id="reward" class="screen">
+<div class="card reward"><div class="big" id="rewardIcon">🎁</div><h2 id="rewardTitle">Hadiah!</h2><p id="rewardText"></p><div class="stars" id="rewardStars"></div>
+<div class="stats"><div class="stat"><b id="rStars">0</b>⭐</div><div class="stat"><b id="rCoins">0</b>🪙</div><div class="stat"><b id="rGems">0</b>💎</div></div>
+<button class="btn primary" onclick="nextAfterReward()">Lanjutkan Petualangan →</button></div>
+</section>
+
+<section id="badges" class="screen">
+<div class="top"><button class="back" onclick="show('home')">🏠 Menu</button><b>🏆 Koleksi Reward</b><div></div></div>
+<div class="card"><div class="small">Kumpulkan bintang, koin, kristal, kunci, dan lencana.</div></div>
+<div class="badges" id="badgeList"></div>
+</section>
+
+<section id="guide" class="screen">
+<div class="top"><button class="back" onclick="show('home')">🏠 Menu</button><b>Cara Bermain</b><div></div></div>
+<div class="card"><h3>🎡 Roda Petualangan</h3><p class="small">Setiap level mempunyai roda berisi tantangan berbeda: hitung, cari angka hilang, pilih hasil, pasangan bilangan, soal cerita, dan bonus reward.</p>
+<h3>❤️ Tanpa timer</h3><p class="small">Murid dapat berpikir dengan tenang. Jawaban salah tidak mengurangi progres wilayah.</p>
+<h3>🔓 Bertahap</h3><p class="small">Level baru terbuka setelah wilayah sebelumnya selesai.</p>
+<h3>🗣️ Umpan balik</h3><p class="small">Benar: “Alhamdulillah, aku berhasil!” Salah: “Belum tepat. Yuk, hitung lagi!”</p></div>
+</section>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+window.addEventListener("error",function(e){
+  console.error("Benteng Bilangan:",e.error||e.message);
+});
+const levels=[
+{name:"Desa Satuan",icon:"🏠",desc:"Pengurangan ratusan tanpa meminjam – mudah",mode:"choice",focus:"tanpa meminjam",types:["Pilih Hasil","Pasangan Bilangan","Benar atau Salah"]},
+{name:"Padang Ratusan",icon:"🏜️",desc:"Pengurangan ratusan tanpa meminjam",mode:"choice",focus:"tanpa meminjam",types:["Bidik Hasil","Pilih Hasil","Angka Hilang"]},
+{name:"Jembatan Angka",icon:"🌉",desc:"Pengurangan ratusan tanpa meminjam",mode:"mixed",focus:"tanpa meminjam",types:["Bangun Jembatan","Cari Pengurang","Pilih Hasil"]},
+{name:"Hutan Tukar",icon:"🌳",desc:"Memahami konsep meminjam",mode:"borrow",focus:"mulai meminjam",types:["Tukar 1 Puluhan","Susun Langkah","Pilih Hasil"]},
+{name:"Lembah Meminjam",icon:"⛰️",desc:"Pengurangan ratusan dengan meminjam",mode:"borrow",focus:"dengan meminjam",types:["Pilih Hasil","Angka Hilang","Cari Kesalahan"]},
+{name:"Gua Angka Hilang",icon:"🪨",desc:"Bilangan yang hilang dalam pengurangan",mode:"missing",focus:"campuran",types:["Kristal Hilang","Pilih Angka","Lengkapi Kalimat"]},
+{name:"Sungai Cerita",icon:"🏞️",desc:"Soal cerita pengurangan ratusan",mode:"story",focus:"soal cerita",types:["Cerita Desa","Toko Angka","Petualangan"]},
+{name:"Gunung Campuran",icon:"🏔️",desc:"Campuran tanpa meminjam dan meminjam",mode:"mix",focus:"campuran",types:["Tantangan Gunung","Pilihan Jalur","Hitung Tepat"]},
+{name:"Menara Master",icon:"🗼",desc:"Tantangan campuran lebih menantang",mode:"master",focus:"campuran",types:["Master Angka","Cari Kesalahan","Angka Rahasia"]},
+{name:"Benteng Raja Angka",icon:"👑",desc:"Final: kuasai seluruh pengurangan ratusan",mode:"final",focus:"final",types:["Raja Angka","Kristal Terakhir","Final Battle"]}
+];
+const DEFAULT_STATE={unlocked:1,completed:[],stars:0,coins:0,gems:0,keys:0,badges:[],levelStars:{}};
+let storageOK=true;
+function loadState(){
+  try{
+    const raw=window.localStorage.getItem("bb_pwa_v3");
+    return raw ? (JSON.parse(raw)||DEFAULT_STATE) : {...DEFAULT_STATE,completed:[],badges:[],levelStars:{}};
+  }catch(e){
+    storageOK=false;
+    return {...DEFAULT_STATE,completed:[],badges:[],levelStars:{}};
+  }
+}
+let state=loadState();
+let currentLevel=1, wheelIndex=0, currentQuestion=0, correct=0, wrong=0, questions=[], deferredPrompt=null;
+
+function save(){
+  try{
+    window.localStorage.setItem("bb_pwa_v3",JSON.stringify(state));
+    storageOK=true;
+  }catch(e){
+    storageOK=false;
+  }
+}
+function show(id){
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  const target=document.getElementById(id);
+  if(target) target.classList.add("active");
+}
+function toast(t){let e=document.getElementById("toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1800)}
+function speak(t){if("speechSynthesis"in window){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="id-ID";u.rate=.92;speechSynthesis.speak(u)}}
+function rnd(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+function noBorrow(){
+ let h=rnd(2,9),t=rnd(1,8),u=rnd(1,9), bh=rnd(1,h-1),bt=rnd(0,t),bu=rnd(0,u);
+ let a=h*100+t*10+u,b=bh*100+bt*10+bu; return [a,b,a-b];
+}
+function borrow(){
+ let h=rnd(3,9),t=rnd(1,8),u=rnd(0,8);
+ let bh=rnd(1,h-1),bt=rnd(0,t),bu=rnd(u+1,9);
+ let a=h*100+t*10+u,b=bh*100+bt*10+bu;
+ if(b>=a)return borrow(); return [a,b,a-b];
+}
+function makeQ(lvl,type){
+ let m=levels[lvl-1], a,b,ans;
+ if(m.mode==="choice"||m.mode==="mixed"){[a,b,ans]=noBorrow();}
+ else if(m.mode==="borrow"){[a,b,ans]=borrow();}
+ else if(m.mode==="missing"){[a,b,ans]=Math.random()<.5?noBorrow():borrow(); }
+ else if(m.mode==="story"||m.mode==="mix"||m.mode==="master"||m.mode==="final"){[a,b,ans]=Math.random()<.5?noBorrow():borrow();}
+ let q=`${a} − ${b} = ?`, correctAns=ans, input=false;
+ if(type.includes("Cari Pengurang")){q=`${a} − ___ = ${ans}`;correctAns=b;input=true}
+ else if(type.includes("Angka Hilang")||type.includes("Kristal Hilang")||type.includes("Pilih Angka")){q=`___ − ${b} = ${ans}`;correctAns=a;input=true}
+ else if(type.includes("Cerita")||type.includes("Toko")||type.includes("Petualangan")){
+   const names=["Alya","Raka","Nisa","Bima"]; const item=["stiker","kelereng","kartu","buku"]; const n=names[rnd(0,3)],it=item[rnd(0,3)];
+   q=`${n} memiliki ${a} ${it}. Ia memberikan ${b} kepada temannya. Berapa ${it} yang tersisa?`; 
+ }
+ return {q,ans:correctAns,input,type,base:a,sub:b};
+}
+function buildWheel(){
+ let svg=document.getElementById("wheelSvg"); let labels=["🧮 Hitung","🧩 Angka Hilang","🎯 Bidik","🧱 Bangun","📖 Cerita","💎 Bonus","🧠 Teka","⭐ Bintang"];
+ let colors=["#5b4bd8","#39a96b","#f3a712","#e45d5d","#3a9bdc","#9b59b6","#e67e22","#20a39e"]; let cx=180,cy=180,r=165;
+ svg.innerHTML="";
+ for(let i=0;i<8;i++){let a0=(i*45-22.5)*Math.PI/180,a1=((i+1)*45-22.5)*Math.PI/180;let x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+ let p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d",`M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 0 1 ${x1} ${y1} Z`);p.setAttribute("fill",colors[i]);p.setAttribute("stroke","#fff");p.setAttribute("stroke-width","3");svg.appendChild(p);
+ let t=document.createElementNS("http://www.w3.org/2000/svg","text");let am=(i*45)*Math.PI/180; t.setAttribute("x",cx+112*Math.cos(am));t.setAttribute("y",cy+112*Math.sin(am));t.setAttribute("fill","#fff");t.setAttribute("font-size","13");t.setAttribute("font-weight","800");t.setAttribute("text-anchor","middle");t.setAttribute("dominant-baseline","middle");t.textContent=labels[i];svg.appendChild(t);}
+}
+function openLevel(n){if(n>state.unlocked){toast("🔒 Selesaikan wilayah sebelumnya dulu.");return}currentLevel=n;document.getElementById("levelTitle").textContent=`${levels[n-1].icon} ${levels[n-1].name}`;document.getElementById("levelPill").textContent=`Level ${n}/10`;buildWheel();show("wheelScreen")}
+function spinWheel(){
+ let btn=document.getElementById("spinBtn");btn.disabled=true; let idx=rnd(0,7); wheelIndex=idx;
+ let rotation=1440+(360-idx*45)+rnd(0,44); document.getElementById("wheelSvg").style.transform=`rotate(${rotation}deg)`;
+ setTimeout(()=>{let types=levels[currentLevel-1].types;let type=types[idx%types.length];startChallenge(type);btn.disabled=false},4100);
+}
+function startChallenge(type){
+ currentQuestion=0;correct=0;wrong=0;questions=[];for(let i=0;i<10;i++)questions.push(makeQ(currentLevel,type));
+ show("game");renderQuestion();
+}
+function renderQuestion(){
+ let q=questions[currentQuestion];document.getElementById("gameProgress").textContent=`${currentQuestion+1}/10`;document.getElementById("challengeType").textContent=`🎯 ${q.type}`;
+ document.getElementById("question").textContent=q.q;document.getElementById("feedback").textContent="";
+ let area=document.getElementById("answerArea");
+ if(q.input){area.innerHTML=`<div class="inputrow"><input id="ansInput" type="number" inputmode="numeric" placeholder="Jawaban"><button class="btn primary" style="margin:0" onclick="checkInput()">Cek</button></div>`}
+ else {let vals=[q.ans];while(vals.length<4){let v=q.ans+rnd(-30,30);if(v>=0&&v<=1000&&!vals.includes(v))vals.push(v)}vals.sort(()=>Math.random()-.5);area.innerHTML=`<div class="options">${vals.map((v,i)=>`<button class="opt" onclick="checkChoice(${v},this)">${"ABCD"[i]}. ${v}</button>`).join("")}</div>`}
+}
+function answerOK(){correct++;state.stars++;state.coins+=2;document.getElementById("feedback").style.color="#299b5d";document.getElementById("feedback").textContent="Alhamdulillah, aku berhasil!";speak("Alhamdulillah, aku berhasil!");save();setTimeout(nextQ,900)}
+function answerBad(){wrong++;document.getElementById("feedback").style.color="#d94d4d";document.getElementById("feedback").textContent="Belum tepat. Yuk, hitung lagi!";speak("Belum tepat. Yuk, hitung lagi!")}
+function checkChoice(v,b){document.querySelectorAll(".opt").forEach(x=>x.disabled=true);if(v===questions[currentQuestion].ans){b.classList.add("correct");answerOK()}else{b.classList.add("wrong");answerBad();setTimeout(()=>document.querySelectorAll(".opt").forEach(x=>x.disabled=false),700)}}
+function checkInput(){let v=Number(document.getElementById("ansInput").value);if(v===questions[currentQuestion].ans)answerOK();else answerBad()}
+function nextQ(){currentQuestion++;if(currentQuestion>=10)finishChallenge();else renderQuestion()}
+function finishChallenge(){
+ let perfect=wrong===0; let earned=perfect?3:2;state.stars+=earned;state.coins+=5; if(perfect)state.gems++;
+ if(!state.completed.includes(currentLevel)){state.completed.push(currentLevel);state.keys++;if(currentLevel<10)state.unlocked=Math.max(state.unlocked,currentLevel+1)}
+ state.levelStars[currentLevel]=Math.max(state.levelStars[currentLevel]||0,earned);save();
+ document.getElementById("rewardIcon").textContent=perfect?"🏆":"🎁";document.getElementById("rewardTitle").textContent=perfect?"LUAR BIASA!":"MISI SELESAI!";document.getElementById("rewardText").textContent=perfect?"Tanpa jawaban salah! Kamu mendapatkan bonus Kristal.":"Kamu berhasil menyelesaikan 10 tantangan. Terus berlatih!";
+ document.getElementById("rewardStars").textContent="⭐".repeat(earned);document.getElementById("rStars").textContent=state.stars;document.getElementById("rCoins").textContent=state.coins;document.getElementById("rGems").textContent=state.gems;
+ unlockBadges();show("reward");
+}
+function nextAfterReward(){if(state.completed.length===10){toast("👑 Benteng Raja Angka ditaklukkan!");show("badges");renderBadges()}else{show("map");renderMap()}}
+function confirmExit(){if(confirm("Keluar dari tantangan? Progres level yang sudah selesai tetap tersimpan."))show("wheelScreen")}
+function renderMap(){
+ document.getElementById("currency").textContent=`⭐ ${state.stars}  💎 ${state.gems}  🔑 ${state.keys}`;
+ let el=document.getElementById("mapNodes");el.innerHTML=levels.map((l,i)=>{let n=i+1,done=state.completed.includes(n),lock=n>state.unlocked;return `<div class="node ${lock?"lock":""} ${done?"done":""}"><div class="ico">${done?"✅":l.icon}</div><div><h3>Level ${n} — ${l.name}</h3><p>${l.desc}</p></div><button onclick="openLevel(${n})">${lock?"🔒":done?"⭐ Ulang":"Masuk"}</button></div>`}).join("")}
+function unlockBadges(){
+ let b=[["🏠","Penjelajah Desa",1],["🌉","Pembangun Jembatan",3],["🌳","Ahli Meminjam",5],["💎","Pemburu Kristal",6],["🏔️","Pendaki Gunung",8],["🗼","Master Angka",9],["👑","Penakluk Benteng",10]];
+ b.forEach(x=>{if(state.completed.includes(x[2])&&!state.badges.includes(x[1]))state.badges.push(x[1])});save()
+}
+function renderBadges(){unlockBadges();document.getElementById("badgeList").innerHTML=[["🏠","Penjelajah Desa",1],["🌉","Pembangun Jembatan",3],["🌳","Ahli Meminjam",5],["💎","Pemburu Kristal",6],["🏔️","Pendaki Gunung",8],["🗼","Master Angka",9],["👑","Penakluk Benteng",10]].map(x=>`<div class="badge ${state.badges.includes(x[1])?"":"locked"}"><div>${x[0]}</div><b>${x[1]}</b><p class="small">Level ${x[2]}</p></div>`).join("")}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;document.getElementById("install").style.display="block"});
+async function installPWA(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null}else toast("Gunakan menu browser: Tambahkan ke layar utama.")}
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+renderMap();
+if(!storageOK){
+  setTimeout(()=>toast("ℹ️ Progres sementara: penyimpanan browser tidak tersedia pada mode ini."),500);
+}
+</script>
+</body>
+</html>
